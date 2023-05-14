@@ -1,0 +1,35 @@
+version: 2.1
+executors:
+  docker-executor:
+    docker:
+      - image: circleci/golang:latest # Go言語のDockerイメージを指定
+
+jobs:
+  build:
+    executor: docker-executor
+    steps:
+      - checkout
+      - run: echo "Building the project..." # プロジェクトのビルドコマンドを実行するステップ
+
+  test:
+    executor: docker-executor
+    steps:
+      - checkout
+      - run: echo "Running tests..." # テストを実行するステップ
+
+  deploy:
+    executor: docker-executor
+    steps:
+      - checkout
+      - run: echo "Deploying the project..." # プロジェクトのデプロイコマンドを実行するステップ
+
+workflows:
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build # ビルドジョブの完了後にテストジョブを実行する
+      - deploy:
+          requires:
+            - test # テストジョブの完了後にデプロイジョブを実行する

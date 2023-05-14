@@ -1,0 +1,37 @@
+version: "3"
+services:
+  gopher:
+    image: golang:1.20
+    working_dir: /go/src
+    volumes:
+      - ./src:/go/src
+      - ./bin:/go/bin
+      - ./csv:/go/csv
+    environment:
+      env_file: .env
+    extra_hosts:
+      - host.docker.internal:host-gateway
+  minio:
+    image: http://quay.io/minio/minio:latest
+    container_name: example-minio
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: password
+    command: server --console-address ":9001" /data
+    ports:
+      - 9009:9000
+      - 9001:9001
+  sendgrid-maildev:
+    image: ykanazawa/sendgrid-maildev
+    hostname: sendgrid-maildev
+    environment:
+      - SENDGRID_DEV_API_SERVER=:3030
+      - SENDGRID_DEV_API_KEY=test_api_key
+      - SENDGRID_DEV_SMTP_SERVER=127.0.0.1:1025
+    container_name: sendgrid-maildev
+    ports:
+      - 1025:1025 #sendGrid → maildevへの中継
+      - 1080:1080 #maildevのブラウザ確認用ポート
+      - 3030:3030 #SendGridのAPIエンドポイントのポート
+    networks:
+      - local-mail
