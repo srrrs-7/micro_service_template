@@ -1,7 +1,8 @@
 package awsSqs
 
 import (
-	"template/pkg/domain"
+	"context"
+	"template/pkg/queue/domain/repository"
 	"template/util/env"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -15,32 +16,16 @@ type Repository struct {
 func NewRepository(
 	env *env.Env,
 	client *sqs.SQS,
-) *Repository {
-	// SQSクライアントを作成
+) repository.Queuer {
 	return &Repository{
 		env:    env,
 		client: client,
 	}
 }
 
-func (r *Repository) SendMessage() ([]*domain.Entity, error) {
-	return nil, nil
+func (r *Repository) Send(ctx context.Context) error {
+	return nil
 }
-func (r *Repository) ReceiveMessage() ([]*domain.Entity, error) {
-	return nil, nil
-}
-func (r *Repository) DeleteMessage() ([]*domain.Entity, error) {
-	return nil, nil
-}
-func (r *Repository) CreateQueue() ([]*domain.Entity, error) {
-	return nil, nil
-}
-func (r *Repository) DeleteQueue() ([]*domain.Entity, error) {
-	return nil, nil
-}
-func (r *Repository) GetQueueAttributes() ([]*domain.Entity, error) {
-	return nil, nil
-}
-func (r *Repository) SetQueueAttributes() ([]*domain.Entity, error) {
-	return nil, nil
+func (r *Repository) Receive(ctx context.Context) error {
+	return nil
 }

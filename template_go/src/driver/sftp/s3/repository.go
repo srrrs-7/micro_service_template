@@ -1,7 +1,8 @@
 package awsS3
 
 import (
-	"template/pkg/domain"
+	"context"
+	"template/pkg/sftp/domain/repository"
 	"template/util/env"
 
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -15,16 +16,16 @@ type Repository struct {
 func NewRepository(
 	env *env.Env,
 	client *s3.S3,
-) *Repository {
+) repository.SftpHandler {
 	return &Repository{
 		env:    env,
 		client: client,
 	}
 }
 
-func (r *Repository) Upload() ([]*domain.Entity, error) {
-	return nil, nil
+func (r *Repository) Upload(ctx context.Context) error {
+	return nil
 }
-func (r *Repository) Download() ([]*domain.Entity, error) {
-	return nil, nil
+func (r *Repository) Download(ctx context.Context) error {
+	return nil
 }

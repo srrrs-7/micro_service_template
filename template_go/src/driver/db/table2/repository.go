@@ -1,10 +1,10 @@
-package table
+package table2
 
 import (
 	"context"
 
-	"template/driver/db/table/model"
-	"template/pkg/db/domain/repository"
+	"template/driver/db/table2/model"
+	"template/pkg/db/domain2/repository"
 
 	"template/util/env"
 
@@ -26,9 +26,9 @@ func NewRepository(
 	}
 }
 
-func (r *Repository) Find(ctx context.Context) (users []model.User, err error) {
+func (r *Repository) Find(ctx context.Context) (model []*model.Model, err error) {
 
-	return users, nil
+	return model, nil
 }
 
 func (r *Repository) Create(ctx context.Context, body map[string]any) error {

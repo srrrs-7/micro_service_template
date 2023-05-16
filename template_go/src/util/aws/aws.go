@@ -15,6 +15,5 @@ func NewAwsSession(env *env.Env) *session.Session {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return sess
 }

@@ -1,30 +1,144 @@
-lepackage api
+package api
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
-	"template/pkg/domain"
-	"template/util/env"
-	"template/util/log"
-
-	"github.com/gorilla/mux"
+	"net/url"
+	"time"
 )
 
-func NewRouter(
-	env *env.Env,
-	domain *domain.Service,
-	// domain domain.Service, 複数のサービスを受け付ける
-	// domain domain.Service,
-	// domain domain.Service,
-) {
-	r := mux.NewRouter()
-	r.Use(log.NewLogging)
+type BaseUrl = string
+type ID = string
+type Secret = string
+type Token = string
 
-	r.HandleFunc("/domain/", domain.Logic).Methods("GET")
+type Auth struct {
+	AuthUrl BaseUrl
+	Url     BaseUrl
+	ID      ID
+	Secret  Secret
+	Token   Token
+}
 
-	fmt.Println("start server on port:", env.HttpPort)
-	err := http.ListenAndServe(":"+env.HttpPort, r)
+type Client interface {
+	Fetch() (Fetch, error)
+}
+
+type client struct {
+	authUrl url.URL
+	apiUrl  url.URL
+	id      ID
+	secret  Secret
+}
+
+type Method = string
+type Path = string
+type Query = url.Values
+type Body = io.Reader
+
+type Fetch interface {
+	Do(ctx context.Context, method Method, path Path, query Query, body Body) (*http.Response, error)
+}
+
+type fetch struct {
+	token  Token
+	apiUrl url.URL
+}
+
+func NewClient(auth *Auth) (*client, error) {
+	authUrl, err := url.Parse(string(auth.AuthUrl))
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+
+	apiUrl, err := url.Parse(string(auth.Url))
+	if err != nil {
+		return nil, err
+	}
+
+	return &client{
+		authUrl: *authUrl,
+		apiUrl:  *apiUrl,
+		id:      auth.ID,
+		secret:  auth.Secret,
+	}, nil
+}
+
+// oauth -> basicAuth -> access token -> fetch api
+func (c *client) Fetch(ctx context.Context) (*fetch, error) {
+	authUrl := c.authUrl
+	authUrl.Path = "/oauth/token"
+
+	reqBody := url.Values{}
+	reqBody.Set("grant_type", "client_credentials")
+
+	req, err := http.NewRequest(
+		http.MethodPost,
+		authUrl.String(),
+		bytes.NewBufferString(reqBody.Encode()),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(string(c.id), string(c.secret))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := newHttpClient().Do(req.WithContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		status := resp.StatusCode
+		body, _ := io.ReadAll(resp.Body)
+		return nil, errors.New(fmt.Sprint(status, ":", string(body)))
+	}
+
+	body := struct {
+		AccessToken Token `json:"access_token"`
+	}{}
+	err = json.NewDecoder(resp.Body).Decode(&body)
+	if err != nil {
+		return nil, err
+	}
+
+	return &fetch{
+		token:  body.AccessToken,
+		apiUrl: c.apiUrl,
+	}, nil
+}
+
+// fetch api execution
+func (f *fetch) Do(
+	ctx context.Context,
+	method Method,
+	path Path,
+	query Query,
+	body Body,
+) (*http.Response, error) {
+	url := f.apiUrl
+	url.Path = path
+	url.RawQuery = query.Encode()
+
+	req, err := http.NewRequest(method, url.String(), body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", string("Bearer "+f.token))
+	req.Header.Set("Content-Type", "application/json")
+
+	return newHttpClient().Do(req.WithContext(ctx))
+}
+
+func newHttpClient() *http.Client {
+	return &http.Client{
+		Timeout: 10 * time.Second,
 	}
 }
