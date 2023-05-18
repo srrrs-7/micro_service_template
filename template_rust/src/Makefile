@@ -1,14 +1,17 @@
+pjt:
+	cargo new --bin template_rust
+
 run:
-	go run ./cmd
+	cargo run -- ./src/cmd
 
 build:
-	go build -o main .
+	cargo build
 
 test:
-	go test ./...
+	cargo test
 
 fmt:
-	go fmt ./...
+	cargo fmt
 
 
-.PHONY: run build test, fmt
+.PHONY: create run build test, fmt
