@@ -12,6 +12,9 @@
 
 - Rust
 
+  - warp
+    tokio = { version = "1", features = ["full"] }
+    warp = "0.3"
   - hyper (hyper = "version")
   - sqlx (sqlx = "version")
 

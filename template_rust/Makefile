@@ -1,17 +1,20 @@
 init:
 	cp compose.override.yml.sample conpose.override.yml
 
-run:
-	go run ./cmd
+pjt:
+	cargo new --bin template_rust
 
-test:
-	go test ./...
+run:
+	cargo run -- ./src/cmd
 
 build:
-	docker build -o goexe .
+	cargo build
+
+test:
+	cargo test
 
 fmt:
-	go fmt ./...
+	cargo fmt
 
 
-.PHONY: init run test build
+.PHONY: init create run build test, fmt

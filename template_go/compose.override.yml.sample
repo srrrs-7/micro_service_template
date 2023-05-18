@@ -8,30 +8,27 @@ services:
       - ./bin:/go/bin
       - ./csv:/go/csv
     environment:
-      env_file: .env
-    extra_hosts:
-      - host.docker.internal:host-gateway
-  minio:
-    image: http://quay.io/minio/minio:latest
-    container_name: example-minio
-    environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: password
-    command: server --console-address ":9001" /data
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASS=secret
+      - DB_NAME=aic
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SSH_KEY=/run/secrets/ssh-key
+    secrets:
+      - ssh-key
+
+  db:
     ports:
-      - 9009:9000
-      - 9001:9001
-  sendgrid-maildev:
-    image: ykanazawa/sendgrid-maildev
-    hostname: sendgrid-maildev
+      - 3306:3306
     environment:
-      - SENDGRID_DEV_API_SERVER=:3030
-      - SENDGRID_DEV_API_KEY=test_api_key
-      - SENDGRID_DEV_SMTP_SERVER=127.0.0.1:1025
-    container_name: sendgrid-maildev
+      - MYSQL_DATABASE=aic
+      - MYSQL_ROOT_PASSWORD=secret
+
+  redis:
     ports:
-      - 1025:1025 #sendGrid → maildevへの中継
-      - 1080:1080 #maildevのブラウザ確認用ポート
-      - 3030:3030 #SendGridのAPIエンドポイントのポート
-    networks:
-      - local-mail
+      - 6379:6379
+secrets:
+  ssh-key:
+    file: ~/.ssh/id_rsa
