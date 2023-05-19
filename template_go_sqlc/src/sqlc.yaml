@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    schema: "./_sqlc/table/schema.sql"
+    queries: "./_sqlc/table/query.sql"
+    gen:
+      go:
+        package: "table"
+        out: "./driver/db/table"
+
+  # - engine: "mysql"
+  #   schema: "sqlc/schema.sql"
+  #   queries: "sqlc/query.sql"
+  #   gen:
+  #     go:
+  #       package: "table"
+  #       out: "src/driver/db/table"
