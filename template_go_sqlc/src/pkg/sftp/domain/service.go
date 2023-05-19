@@ -3,15 +3,20 @@ package domain
 import (
 	"context"
 	"template/pkg/sftp/domain/repository"
-	"template/pkg/sftp/domain/usecase"
+	"template/util/env"
 )
 
 type Service struct {
+	env  *env.Env
 	sftp repository.SftpHandler
 }
 
-func NewService(sftp repository.SftpHandler) usecase.SftpHandler {
+func NewService(
+	env *env.Env,
+	sftp repository.SftpHandler,
+) *Service {
 	return &Service{
+		env:  env,
 		sftp: sftp,
 	}
 }

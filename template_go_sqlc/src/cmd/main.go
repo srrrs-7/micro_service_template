@@ -36,25 +36,27 @@ func main() {
 		Token:   "",
 	})
 	// DB connection
-	db , err := db.NewDb(env)
+	db, err := db.NewDb(env)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
+	// sqlc queries
+	queries := table.New(db)
 	// aws session
 	sess := aws.NewAwsSession(env)
 	sqs := queue.NewSqs(env, sess)
 	s3 := sftp.NewS3(env, sess)
 	// repository
 	client := domain.NewRepository(env, cli)
-	store := table.NewRepository(env, db)
+	store := table.NewRepository(env, db, queries)
 	queue := awsSqs.NewRepository(env, sqs)
 	sftp := awsS3.NewRepository(env, s3)
 	// service
-	apiService := apiService.NewService(client)
-	dbService := dbService.NewService(store)
-	queueService := queueService.NewService(queue)
-	sftpService := sftpService.NewService(sftp)
+	apiService := apiService.NewService(env, client)
+	dbService := dbService.NewService(env, store)
+	queueService := queueService.NewService(env, queue)
+	sftpService := sftpService.NewService(env, sftp)
 
 	// logic
 	logicRepo := pkg.NewRepositories(

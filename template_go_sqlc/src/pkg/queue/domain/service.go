@@ -3,15 +3,20 @@ package domain
 import (
 	"context"
 	"template/pkg/queue/domain/repository"
-	"template/pkg/queue/domain/usecase"
+	"template/util/env"
 )
 
 type Service struct {
+	env   *env.Env
 	queue repository.Queuer
 }
 
-func NewService(queue repository.Queuer) usecase.Queuer {
+func NewService(
+	env *env.Env,
+	queue repository.Queuer,
+) *Service {
 	return &Service{
+		env:   env,
 		queue: queue,
 	}
 }

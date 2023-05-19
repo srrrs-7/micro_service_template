@@ -2,30 +2,30 @@ package pkg
 
 import (
 	"net/http"
-	api "template/pkg/api/domain/usecase"
-	db "template/pkg/db/table/usecase"
-	queue "template/pkg/queue/domain/usecase"
-	sftp "template/pkg/sftp/domain/usecase"
+	api "template/pkg/api/domain"
+	db "template/pkg/db/table"
+	queue "template/pkg/queue/domain"
+	sftp "template/pkg/sftp/domain"
 )
 
 type Repositories struct {
-	api   api.Client
-	db    db.Store
-	queue queue.Queuer
-	sftp  sftp.SftpHandler
+	apiService   *api.Service
+	dbService    *db.Service
+	queueService *queue.Service
+	sftpService  *sftp.Service
 }
 
 func NewRepositories(
-	api api.Client,
-	db db.Store,
-	queue queue.Queuer,
-	sftp sftp.SftpHandler,
+	apiService *api.Service,
+	dbService *db.Service,
+	queueService *queue.Service,
+	sftpService *sftp.Service,
 ) *Repositories {
 	return &Repositories{
-		api:   api,
-		db:    db,
-		queue: queue,
-		sftp:  sftp,
+		apiService:   apiService,
+		dbService:    dbService,
+		queueService: queueService,
+		sftpService:  sftpService,
 	}
 }
 

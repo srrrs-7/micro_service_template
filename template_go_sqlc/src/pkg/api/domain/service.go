@@ -5,15 +5,20 @@ import (
 	"net/url"
 	"template/pkg/api/domain/entity"
 	"template/pkg/api/domain/repository"
-	"template/pkg/api/domain/usecase"
+	"template/util/env"
 )
 
 type Service struct {
+	env    *env.Env
 	client repository.Client
 }
 
-func NewService(client repository.Client) usecase.Client {
+func NewService(
+	env *env.Env,
+	client repository.Client,
+) *Service {
 	return &Service{
+		env:    env,
 		client: client,
 	}
 }
