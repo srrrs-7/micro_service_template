@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"template/util/env"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func NewDb(env *env.Env) (*sql.DB, error) {
