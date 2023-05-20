@@ -19,11 +19,11 @@ INSERT INTO authors (
 `
 
 type CreateAuthorParams struct {
-	Name string
-	Bio  sql.NullString
+	Name string         `db:"name" json:"name"`
+	Bio  sql.NullString `db:"bio" json:"bio"`
 }
 
-func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (sql.Result, error) {
+func (q *Queries) CreateAuthor(ctx context.Context, arg *CreateAuthorParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createAuthor, arg.Name, arg.Bio)
 }
 
